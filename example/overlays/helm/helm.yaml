@@ -1,0 +1,10 @@
+apiVersion: helm/v1
+kind: HelmTransformer
+metadata:
+  name: external-dns
+ChartName: external-dns
+ChartVersion: 0.1.0
+appVersion: 0.2.0
+Values:
+  DOMAIN: example.com
+  PROVIDER: aws
