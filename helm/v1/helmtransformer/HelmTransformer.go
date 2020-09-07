@@ -44,11 +44,11 @@ func (p *plugin) Config(
 func (p *plugin) Transform(m resmap.ResMap) (err error) {
 	var resources []*resource.Resource
 	lb := make(map[string]string)
-	lb["helm.sh/chart"] = p.ChartName + "-" + p.ChartVersion
-	lb["app.kubernetes.io/name"] = p.ChartName
+	lb["helm.sh/chart"] = "{{ printf \"%s-%s\" .Chart.Name .Chart.Version | replace \"+\" \"_\" | trunc 63 | trimSuffix \"-\" }}"
+	lb["app.kubernetes.io/name"] = "{{ .Chart.Name }}"
 	lb["app.kubernetes.io/instance"] = "{{ .Release.Name }}"
-	lb["app.kubernetes.io/version"] = p.ChartVersion
-	lb["app.kubernetes.io/managed-by"] = "Helm"
+	lb["app.kubernetes.io/version"] = "{{ .Chart.Version }}"
+	lb["app.kubernetes.io/managed-by"] = "{{ .Release.Service }}"
 	for _, res := range m.Resources() {
 		if res.GetKind() != "Namespace" {
 			resources = append(resources, res)
@@ -81,7 +81,7 @@ func (p *plugin) Transform(m resmap.ResMap) (err error) {
 func (p *plugin) createChartYaml() (err error) {
 	os.MkdirAll(p.ChartName+"/templates", os.ModePerm)
 	chartYaml := &chart{
-		ApiVersion:  "v2",
+		ApiVersion:  "v3",
 		Name:        p.ChartName,
 		Description: p.ChartName + " Helm chart for Kubernetes",
 		Version:     p.ChartVersion,
