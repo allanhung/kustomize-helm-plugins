@@ -23,8 +23,9 @@ type plugin struct {
 	AppVersion   string                 `json:"appVersion,omitempty" yaml:"appVersion,omitempty"`
 	Values       map[string]interface{} `json:"values,omitempty" yaml:"values,omitempty"`
 
-	Logger *log.Logger
-	h      *resmap.PluginHelpers
+	Logger      *log.Logger
+	h           *resmap.PluginHelpers
+  chartRoot   string
 }
 
 var KustomizePlugin plugin
@@ -32,6 +33,7 @@ var KustomizePlugin plugin
 func (p *plugin) Config(
 	h *resmap.PluginHelpers, c []byte) (err error) {
 	p.h = h
+  p.chartRoot = "chart"
 
 	err = yaml.Unmarshal(c, p)
 	if err != nil {
@@ -79,7 +81,7 @@ func (p *plugin) Transform(m resmap.ResMap) (err error) {
 }
 
 func (p *plugin) createChartYaml() (err error) {
-	os.MkdirAll(p.ChartName+"/templates", os.ModePerm)
+	os.MkdirAll(p.chartRoot+"/templates", os.ModePerm)
 	chartYaml := &chart{
 		ApiVersion:  "v3",
 		Name:        p.ChartName,
@@ -91,7 +93,7 @@ func (p *plugin) createChartYaml() (err error) {
 	if err != nil {
 		return err
 	}
-	err = ioutil.WriteFile(p.ChartName+"/Chart.yaml", chartBytes, os.ModePerm)
+	err = ioutil.WriteFile(p.chartRoot+"/Chart.yaml", chartBytes, os.ModePerm)
 	if err != nil {
 		return err
 	}
@@ -103,7 +105,7 @@ func (p *plugin) createChartValue() (err error) {
 	if err != nil {
 		return err
 	}
-	err = ioutil.WriteFile(p.ChartName+"/values.yaml", chartValues, os.ModePerm)
+	err = ioutil.WriteFile(p.chartRoot+"/values.yaml", chartValues, os.ModePerm)
 	if err != nil {
 		return err
 	}

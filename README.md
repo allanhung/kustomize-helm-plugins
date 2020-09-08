@@ -26,7 +26,7 @@ metadata:
   name: external-dns
 ChartName: external-dns
 ChartVersion: 0.1.0
-appVersion: 0.2.0
+appVersion: 0.7.3
 Values:
   DOMAIN: example.com
   PROVIDER: aws
@@ -35,7 +35,7 @@ Values:
 ### [kustomize for external-dns](https://github.com/kubernetes-sigs/external-dns/tree/master/kustomize) to Helm Chart
 ```
 cd example
-mkdir -p external-dns/templates
-docker run -v ${PWD}:/working kustomize-helm-plugins overlays/helm > external-dns/templates/external-dns.yaml
-helm template --release-name kustomize --namespace external-dns-ns -f external-dns/values.yaml external-dns/
+mkdir -p chart/templates
+docker run -v ${PWD}:/working kustomize-helm-plugins kustomize/overlays/helm > chart/templates/all.yaml
+helm template --release-name kustomize --namespace external-dns-ns -f chart/values.yaml chart/
 ```
